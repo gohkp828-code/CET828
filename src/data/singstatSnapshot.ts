@@ -1032,6 +1032,16 @@ export const OPEN_DATA_APIS: {
     frequency: 'Annual / Biennial'
   },
   {
+    id: 'd_d1fbb24161f78e72bed494bd2ba9d091',
+    source: 'data.gov.sg',
+    title: 'Training Places Taken Up By Course Level & Gender (Live Datastore)',
+    agency: 'Ministry of Education / ITE / data.gov.sg',
+    description: 'Live Singapore Open Data datastore tracking training places across Engineering, ICT, Business & Services, and ITE Skills Certificates by Gender and Year (2010-2025).',
+    datasetOrTableId: 'd_d1fbb24161f78e72bed494bd2ba9d091',
+    apiUrl: 'https://data.gov.sg/api/action/datastore_search?resource_id=d_d1fbb24161f78e72bed494bd2ba9d091',
+    frequency: 'Annual'
+  },
+  {
     id: 'd_ecba92f3eb2e32da9625a7ab97164109',
     source: 'data.gov.sg',
     title: 'Training Places Taken Up (Data.gov.sg v2 Resource)',

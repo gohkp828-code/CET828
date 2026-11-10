@@ -4,6 +4,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { GoogleGenAI } from '@google/genai';
 
+import healthHandler from './api/health.ts';
+import cetHandler from './api/cet.ts';
+
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -14,6 +17,15 @@ const PORT = process.env.PORT || 3000;
 const isProd = process.env.NODE_ENV === 'production';
 
 app.use(express.json());
+
+// Serverless / API routes
+app.get('/api/health', (req, res) => {
+  return healthHandler(req, res);
+});
+
+app.get('/api/cet', (req, res) => {
+  return cetHandler(req, res);
+});
 
 // In-memory cache for Singapore Government Open Data API responses
 const apiCache = new Map<string, { data: unknown; timestamp: number }>();

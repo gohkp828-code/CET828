@@ -21,13 +21,17 @@ export const ApiHubAndAI: React.FC = () => {
     'What are the highest-demand CET qualifications for mid-career workers aged 40 and above in Singapore?',
   ];
 
+  const [liveCetData, setLiveCetData] = useState<any>(null);
+
   const handleTestApi = async (api: typeof OPEN_DATA_APIS[0]) => {
     setTestingApiId(api.id);
     const start = performance.now();
 
     try {
       let endpoint = '';
-      if (api.source === 'singstat') {
+      if (api.id === 'd_d1fbb24161f78e72bed494bd2ba9d091') {
+        endpoint = '/api/cet';
+      } else if (api.source === 'singstat') {
         endpoint = `/api/singstat/${api.datasetOrTableId}`;
       } else {
         endpoint = `/api/datagov/list-rows/${api.datasetOrTableId}`;
@@ -36,6 +40,10 @@ export const ApiHubAndAI: React.FC = () => {
       const res = await fetch(endpoint);
       const latency = Math.round(performance.now() - start);
       const json = await res.json();
+
+      if (api.id === 'd_d1fbb24161f78e72bed494bd2ba9d091' && json.success) {
+        setLiveCetData(json);
+      }
 
       setApiResponses((prev) => ({
         ...prev,
@@ -184,6 +192,100 @@ export const ApiHubAndAI: React.FC = () => {
                 );
               })}
             </div>
+          </div>
+
+          {/* Live Datastore Visualizer Card for d_d1fbb24161f78e72bed494bd2ba9d091 */}
+          <div className="bg-white p-5 rounded-xl border border-slate-200 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-800">
+                <Terminal className="w-4 h-4 text-blue-600" />
+                <span>Live Datastore Viewer (d_d1fbb24161f78e72bed494bd2ba9d091)</span>
+              </div>
+              <span className="text-[11px] font-mono text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                /api/cet
+              </span>
+            </div>
+
+            <p className="text-xs text-slate-500">
+              Connected live to official endpoint: <code className="bg-slate-100 px-1 py-0.5 rounded text-[10px] font-mono">https://data.gov.sg/api/action/datastore_search?resource_id=d_d1fbb24161f78e72bed494bd2ba9d091</code>
+            </p>
+
+            {liveCetData ? (
+              <div className="space-y-4 text-xs">
+                {/* Highlights */}
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                    <div className="text-[10px] text-slate-500">Records Pulled</div>
+                    <div className="text-base font-bold font-mono text-slate-900 mt-0.5">
+                      {liveCetData.totalRecords} rows
+                    </div>
+                  </div>
+                  <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                    <div className="text-[10px] text-slate-500">Years Span</div>
+                    <div className="text-base font-bold font-mono text-slate-900 mt-0.5">
+                      {liveCetData.yearsAvailable?.[0]} - {liveCetData.yearsAvailable?.[liveCetData.yearsAvailable.length - 1]}
+                    </div>
+                  </div>
+                  <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                    <div className="text-[10px] text-slate-500">Source Mode</div>
+                    <div className="text-base font-bold font-mono text-emerald-600 mt-0.5">
+                      {liveCetData.source.toUpperCase()}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Gender Split */}
+                {liveCetData.genderTotals && (
+                  <div>
+                    <div className="font-semibold text-slate-700 mb-2">Gender Breakdown (Total Training Places):</div>
+                    <div className="grid grid-cols-2 gap-3">
+                      {liveCetData.genderTotals.map((g: any) => (
+                        <div key={g.gender} className="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                          <div className="flex justify-between items-baseline mb-1">
+                            <span className="font-bold text-slate-800">{g.gender}</span>
+                            <span className="font-mono font-semibold text-slate-900">{g.percentage}%</span>
+                          </div>
+                          <div className="text-[11px] font-mono text-slate-500">
+                            {g.totalPlaces.toLocaleString()} places
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Top Course Levels */}
+                {liveCetData.courseLevelTotals && (
+                  <div>
+                    <div className="font-semibold text-slate-700 mb-2">Top Course Levels Tracked:</div>
+                    <div className="space-y-1.5">
+                      {liveCetData.courseLevelTotals.slice(0, 5).map((cl: any) => (
+                        <div key={cl.courseLevel} className="flex justify-between items-center text-[11px] p-2 bg-slate-50 rounded border border-slate-100">
+                          <span className="text-slate-700 font-medium truncate max-w-[240px]">{cl.courseLevel}</span>
+                          <span className="font-mono tabular-nums font-bold text-slate-900">{cl.totalPlaces.toLocaleString()} ({cl.percentage}%)</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="p-6 text-center border border-dashed border-slate-200 rounded-lg space-y-2">
+                <p className="text-xs text-slate-500">
+                  Click below to fetch and visualize live records from the serverless <code className="font-mono text-slate-700">/api/cet</code> connection.
+                </p>
+                <button
+                  onClick={() => {
+                    const api = OPEN_DATA_APIS.find((a) => a.id === 'd_d1fbb24161f78e72bed494bd2ba9d091') || OPEN_DATA_APIS[0];
+                    handleTestApi(api);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Fetch Live Datastore Records</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
