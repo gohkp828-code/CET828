@@ -1,0 +1,6 @@
+{
+  "name": "Singapore IHL Continuing Education & Training (CET) Tracker",
+  "description": "Comprehensive analytics and data crushing dashboard for Continuing Education and Training across Singapore Institutes of Higher Learning (Autonomous Universities, Polytechnics, and ITE), powered by Singapore Open Data Portal APIs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
